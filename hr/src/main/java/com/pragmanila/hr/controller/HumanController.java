@@ -1,4 +1,4 @@
-package com.pragmanila.hr;
+package com.pragmanila.hr.controller;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import com.pragmanila.hr.model.Human;
 
 
 @RestController
