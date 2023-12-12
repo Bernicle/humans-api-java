@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.pragmanila.hr.model.Human;
+import com.pragmanila.hr.model.HumanResponseStructure;
 
 @RestController
 public class HumanController {
@@ -33,12 +34,11 @@ public class HumanController {
 	}
 
 	@GetMapping("/humans")
-	public Map<String, Object> getAllHumans(){
-		Map<String, Object> data = new HashMap<>();
+	public HumanResponseStructure getAllHumans(){
+		HumanResponseStructure data;
+		
 		Human[] arrayHuman = listOfHuman.toArray(new Human[0]);
-
-		data.put("data", arrayHuman);
-		data.put("Total", arrayHuman.length);
+		data = new HumanResponseStructure(arrayHuman, arrayHuman.length);
 		return data;
 	}
 
