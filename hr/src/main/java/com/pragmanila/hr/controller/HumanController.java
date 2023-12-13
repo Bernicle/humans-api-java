@@ -60,57 +60,44 @@ public class HumanController {
 	}
 
 	@PostMapping("/human")
-	public Map<String, Object> registerHuman(@RequestBody Human human){
+	public ResponseStructure registerHuman(@RequestBody Human human){
 		listOfHuman.add(human);
 		
-		Map<String, Object> data = new HashMap<>();
-		
-		data.put("message", "Registration Successful.");
-		data.put("TotalRegistrant", listOfHuman.size());
-
-		return data;
+		return new ResponseStructure("success", "Registration Successful.");
 	}
-
-	@GetMapping("/test")
-	public ResponseStructure testing(){
-		return null;
-	}
-
+	
 	@PutMapping("/human/{id}")
-	public Map<String, Object> updateHuman(@PathVariable Long id, @RequestBody Human human){
+	public ResponseStructure updateHuman(@PathVariable Long id, @RequestBody Human human){
 		System.out.println(human);
 		
 		int index = findHuman(id);
 
-		Map<String, Object> data = new HashMap<>();
+		ResponseStructure data = null;
 		
 		if (index != -1) {
 			listOfHuman.set(index, human);
-			data.put("message", "Update Successful.");
+			// data.put("message", "Update Successful.");
+			return new ResponseStructure("200", "Update Successful.");
 		} else {
-			data.put("message", "Update Successful.");
+			// data.put("message", "Update Successful.");
+			return new ResponseStructure("404", "Record not found.");
 		}
-
-		data.put("TotalRegistrant", listOfHuman.size());
-
-		return data;
 	}
 
 	@DeleteMapping("/human/{id}")
-	public void deleteHuman(@PathVariable Long id){
+	public ResponseStructure deleteHuman(@PathVariable Long id){
 		int index = findHuman(id);
 
 		if (index < 0)
 		{
-			System.out.println("Failed to delete. No ID Found");
-			return;
+			return new ResponseStructure("404", "Failed to delete. No ID Found");
 		}
 
 		boolean removed = listOfHuman.remove(listOfHuman.get(index));
         if (removed) {
-            System.out.println("Object deleted successfully.");
+			return new ResponseStructure("200", "Object deleted successfully.");
         } else {
-            System.out.println("Object not found in the list.");
+ 			return new ResponseStructure("404", "Object not found in the list.");
         }
 	}
 }
