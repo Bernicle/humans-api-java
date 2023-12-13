@@ -18,6 +18,7 @@ import java.util.Map;
 
 import com.pragmanila.hr.model.Human;
 import com.pragmanila.hr.model.HumanResponseStructure;
+import com.pragmanila.hr.model.ResponseStructure;
 
 @RestController
 public class HumanController {
@@ -43,21 +44,18 @@ public class HumanController {
 	}
 
 	@GetMapping("/human/{id}")
-	public Map<String, Object> getHumanBasedOnId(@PathVariable Long id){
-		Map<String, Object> data = new HashMap<>();
+	public HumanResponseStructure getHumanBasedOnId(@PathVariable Long id){
+		HumanResponseStructure data = null;
 		
-		Human arrayHuman;
-
 		int index = findHuman(id);
 
 		if (index != -1) {
-			data.put("data", listOfHuman.get(index));
-			data.put("Total", 1);
+			//data.put("data", listOfHuman.get(index));
+			//data.put("Total", 1);
+			data = new HumanResponseStructure(new Human[]{listOfHuman.get(index)}, 1);
 		} else {
-			data.put("data", new Human[0]);
-			data.put("Total", 0);
+			data = new HumanResponseStructure(new Human[0], 0);
 		}
-
 		return data;
 	}
 
@@ -71,6 +69,11 @@ public class HumanController {
 		data.put("TotalRegistrant", listOfHuman.size());
 
 		return data;
+	}
+
+	@GetMapping("/test")
+	public ResponseStructure testing(){
+		return null;
 	}
 
 	@PutMapping("/human/{id}")
