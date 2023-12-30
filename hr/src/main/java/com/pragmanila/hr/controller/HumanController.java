@@ -34,31 +34,32 @@ public class HumanController {
 	private HumanRepository humanRepository;
 
 	@GetMapping("/humans")
-	public HumanResponseStructure getAllHumans(){
-		HumanResponseStructure data;
-		
-		List<Human> listOfHuman = new ArrayList<Human>();
-        humanRepository.findAll().forEach(listOfHuman::add);
+	public ResponseEntity<HumanResponseStructure> getAllHumans(){
+		try{
+			HumanResponseStructure data;
+			List<Human> listOfHuman = new ArrayList<Human>();
+			humanRepository.findAll().forEach(listOfHuman::add);
 
-		data = new HumanResponseStructure(listOfHuman.toArray(new Human[0]), listOfHuman.toArray(new Human[0]).length);
-		return data;
+			data = new HumanResponseStructure(listOfHuman.toArray(new Human[0]), listOfHuman.toArray(new Human[0]).length);
+			return new ResponseEntity<>(data, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
-	// @GetMapping("/human/{id}")
-	// public HumanResponseStructure getHumanBasedOnId(@PathVariable Long id){
-	// 	HumanResponseStructure data = null;
+	@GetMapping("/human/{id}")
+	public ResponseEntity<HumanResponseStructure> getHumanBasedOnId(@PathVariable Long id){
+		HumanResponseStructure data = null;
 		
-	// 	int index = findHuman(id);
+		Human human = humanRepository.findById(id).orElse(null);
 
-	// 	if (index != -1) {
-	// 		//data.put("data", listOfHuman.get(index));
-	// 		//data.put("Total", 1);
-	// 		data = new HumanResponseStructure(new Human[]{listOfHuman.get(index)}, 1);
-	// 	} else {
-	// 		data = new HumanResponseStructure(new Human[0], 0);
-	// 	}
-	// 	return data;
-	// }
+		if (human != null) {
+			data = new HumanResponseStructure(new Human[]{human}, 1);
+		} else {
+			data = new HumanResponseStructure(new Human[0], 0);
+		}
+		return new ResponseEntity<>(data, HttpStatus.OK);
+	}
 
 	@PostMapping("/human")
 	public ResponseEntity<Human> registerHuman(@RequestBody Human human){
@@ -70,38 +71,30 @@ public class HumanController {
 		}
 	}
 	
-	// @PutMapping("/human/{id}")
-	// public ResponseStructure updateHuman(@PathVariable Long id, @RequestBody Human human){
-	// 	System.out.println(human);
+	@PutMapping("/human/{id}")
+	public ResponseEntity<ResponseStructure> updateHuman(@PathVariable Long id, @RequestBody Human human){
 		
-	// 	int index = findHuman(id);
+		Human currentHuman = humanRepository.findById(id).orElse(null);
 
-	// 	ResponseStructure data = null;
-		
-	// 	if (index != -1) {
-	// 		listOfHuman.set(index, human);
-	// 		// data.put("message", "Update Successful.");
-	// 		return new ResponseStructure("200", "Update Successful.");
-	// 	} else {
-	// 		// data.put("message", "Update Successful.");
-	// 		return new ResponseStructure("404", "Record not found.");
-	// 	}
-	// }
+		if (currentHuman != null) {
+			humanRepository.save(human);
+			// data.put("message", "Update Successful.");
+			return new ResponseEntity<>(new ResponseStructure("200", "Update Successful."), HttpStatus.OK);
+		} else {
+			// data.put("message", "Update Successful.");
+			return new ResponseEntity<>(new ResponseStructure("400", "No Record exist found."), HttpStatus.BAD_REQUEST);
+		}
+	}
 
-	// @DeleteMapping("/human/{id}")
-	// public ResponseStructure deleteHuman(@PathVariable Long id){
-	// 	int index = findHuman(id);
+	@DeleteMapping("/human/{id}")
+	public ResponseEntity<ResponseStructure> deleteHuman(@PathVariable Long id){
+		Human currentHuman = humanRepository.findById(id).orElse(null);
 
-	// 	if (index < 0)
-	// 	{
-	// 		return new ResponseStructure("404", "Failed to delete. No ID Found");
-	// 	}
-
-	// 	boolean removed = listOfHuman.remove(listOfHuman.get(index));
-    //     if (removed) {
-	// 		return new ResponseStructure("200", "Object deleted successfully.");
-    //     } else {
- 	// 		return new ResponseStructure("404", "Object not found in the list.");
-    //     }
-	// }
+		if (currentHuman != null) {
+			humanRepository.deleteById(id);
+			return new ResponseEntity<>(new ResponseStructure("200", "Deleted Successful."), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(new ResponseStructure("400", "No Record exist found."), HttpStatus.BAD_REQUEST);
+		}
+	}
 }
