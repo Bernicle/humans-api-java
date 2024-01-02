@@ -77,7 +77,7 @@
         <h2 style="color: var(--primary-color);">Human Resources Management System</h2>
 
         <button onclick="populateTable()" class="MuiButton-root MuiButton-contained">Show Record</button>
-        <button onclick="toggleDisplayPopup()" class="MuiButton-root MuiButton-contained">Add New Record</button>
+        <button onclick="showRegisterGUI()" class="MuiButton-root MuiButton-contained">Add New Record</button>
 
         <div class="overlay" id="overlay"></div>
         <div class="popup-container" id="popup">
@@ -96,8 +96,9 @@
                         <label for="last-name">Last Name:</label>
                         <input type="text" id="last-name" placeholder="Enter last name">
                     </div>
-                    <button onclick="addCustomRecord()" class="MuiButton-root MuiButton-contained">Register</button>
-                    <button onclick="toggleDisplayPopup()" class="MuiButton-root MuiButton-contained">Close</button>
+                    <button onclick="addCustomRecord()" id="register-button" class="MuiButton-root MuiButton-contained" style="display:initial">Register</button>
+                    <button onclick="updateRecord()" id="update-button" class="MuiButton-root MuiButton-contained" style="display:none">Update</button>
+                    <button onclick="hidePopup()" class="MuiButton-root MuiButton-contained">Close</button>
                 </div>
             </div>
         </div>
@@ -113,10 +114,14 @@
         // Declare jsonData as a global variable
         var jsonData = [];
 
-        function populateTable() {
+        async function populateTable() {
 
             var tableBody = document.getElementById("data-table-body");
             tableBody.innerHTML = '';
+
+            var listOfHumanData = await listOfHuman();
+            
+            jsonData = listOfHumanData.data;
 
             for (var i = 0; i < jsonData.length; i++) {
                 var card = document.createElement("div");
@@ -137,97 +142,297 @@
         function showUpdateGUI(recordId){
             var myDiv = document.getElementById("overlay");
             var myPopup = document.getElementById("popup");
+            var popupIdLabel = document.getElementById("popup-id");
             var popupIdContainer = document.getElementById("pop-id-container");
             var popupTitleText = document.getElementById("popup-title-text");
+            var firstNameInput = document.getElementById("first-name");
+            var lastNameInput = document.getElementById("last-name");
+            var registerButton = document.getElementById("register-button");
+            var updateButton = document.getElementById("update-button");
             
+            const resultObject = jsonData.find(item => item.id === recordId);
+
+            firstNameInput.value = resultObject.first_name;
+            lastNameInput.value = resultObject.last_name;
+            popupIdLabel.textContent = resultObject.id;
+
             popupTitleText.textContent = "Update Details";
             popupIdContainer.style.display = "block";
             myDiv.style.display = "block";
             myPopup.style.display = "block";
+            registerButton.style.display = "none";
+            updateButton.style.display = "inline";
+        }
+
+        function showRegisterGUI(recordId){
+            var myDiv = document.getElementById("overlay");
+            var myPopup = document.getElementById("popup");
+            var popupIdLabel = document.getElementById("popup-id");
+            var popupIdContainer = document.getElementById("pop-id-container");
+            var popupTitleText = document.getElementById("popup-title-text");
+            var firstNameInput = document.getElementById("first-name");
+            var lastNameInput = document.getElementById("last-name");
+            var registerButton = document.getElementById("register-button");
+            var updateButton = document.getElementById("update-button");
+            
+            popupIdLabel.textContent = "";
+            firstNameInput.value = "";
+            lastNameInput.value = "";
+
+            popupTitleText.textContent = "Add New Record";
+            popupIdContainer.style.display = "none";
+            myDiv.style.display = "block";
+            myPopup.style.display = "block";
+            registerButton.style.display = "inline";
+            updateButton.style.display = "none";
         }
 
         // Function to delete a record from jsonData based on ID
-        function deleteRecord(recordId) {
-            jsonData = jsonData.filter(function(record) {
-                return record.id !== recordId;
-            });
+        async function deleteRecord(recordId) {
+            
+            await deleteHuman(recordId)
 
             populateTable(); // Refresh the table after deletion
         }
 
-        function toggleDisplayPopup() {
+        function hidePopup() {
             var myDiv = document.getElementById("overlay");
             var myPopup = document.getElementById("popup");
+
+            myDiv.style.display = "none";
+            myPopup.style.display = "none";            
             
-            if (myDiv.style.display === "none" || myDiv.style.display === "") {
-                myDiv.style.display = "block";
-                myPopup.style.display = "block";
-            } else {
-                myDiv.style.display = "none";
-                myPopup.style.display = "none";
-            }
+            // showRegisterGUI();
         }
 
-        function listOfHuman(id = null, first_name = null, last_name = null) {
+        async function listOfHuman(id = null, first_name = null, last_name = null) {
             var ddd = null;
 
-            if (id != null){
+            if (id == null){
                 var requestOptions = {
                   method: 'GET',
                   redirect: 'follow'
                 };
 
-                fetch("http://localhost:8080/api/humans", requestOptions)
-                .then(response => response.json())
-                .then(result => {
+                try{
+                    const response = await fetch("http://localhost:8080/api/humans", requestOptions);
+
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
                     ddd = result;
-                })
-                .catch(error => console.log('error', error));
-                return ddd;
+                    
+                    return ddd;
+                }
+                catch(error){
+                    console.error('Error fetching data:', error.message);
+                    throw error;
+                }
             }
             else {
+
+                try{
+                    const response = await fetch("http://localhost:8080/api/human/${id}");
+
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    ddd = [result];
+                    
+                    return ddd;
+                }
+                catch(error){
+                    console.error('Error fetching data:', error.message);
+                    throw error;
+                }
+
                 return ddd
             }
         }
 
-        function addCustomRecord() {
+
+        async function registerHuman(first_name = null, last_name = null) {
+            
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            if (first_name == null || last_name == null)
+            {
+                alert("Please Complete the detail before proceed!")
+                return false;
+            }
+
+            var raw = JSON.stringify({
+              "first_name": first_name,
+              "last_name": last_name
+            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'  
+            };
+
+            try{
+                const response = await fetch("http://localhost:8080/api/human", requestOptions);
+
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                    return false;
+                }
+
+                const result = await response.json();
+                return true;
+            }
+            catch(error){
+                console.error('Error fetching data:', error.message);
+                throw error;
+                return false;
+            }
+        }
+
+        async function updateHuman(id = null, first_name = null, last_name = null) {
+            
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            if (id == null)
+            {
+                alert("Missing Argument! Argument: id")
+                return false;
+            }
+
+            if (first_name == null || last_name == null)
+            {
+                alert("Please Complete the detail before proceed!")
+                return false;
+            }
+
+            var raw = JSON.stringify({
+                "id":id,
+                "first_name": first_name,
+                "last_name": last_name
+            });
+
+            var requestOptions = {
+                method: 'PUT',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'  
+            };
+
+            try{
+                const response = await fetch("http://localhost:8080/api/human/" + id, requestOptions);
+
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                    return false;
+                }
+
+                const result = await response.json();
+                return true;
+            }
+            catch(error){
+                console.error('Error fetching data:', error.message);
+                throw error;
+                return false;
+            }
+        }
+
+        async function deleteHuman(id = null) {
+
+            if (id == null)
+            {
+                alert("Missing Argument! Argument: id")
+                return false;
+            }
+
+            var requestOptions = {
+                method: 'DELETE',
+                redirect: 'follow'  
+            };
+
+            try{
+                const response = await fetch("http://localhost:8080/api/human/" + id, requestOptions);
+
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                    return false;
+                }
+
+                const result = await response.json();
+                return true;
+            }
+            catch(error){
+                console.error('Error fetching data:', error.message);
+                throw error;
+                return false;
+            }
+        }
+
+
+        async function addCustomRecord() {
             // Ensure jsonData is initialized
             if (!jsonData) {
                 jsonData = [];
             }
 
-            var jjjj = listOfHuman();
-            console.log(typeof jjjj);
-            console.log(jjjj);
+            // Get values from input fields
+            // var popupIdLabel = document.getElementById("popup-id");
+            var firstNameInput = document.getElementById("first-name");
+            var lastNameInput = document.getElementById("last-name");
+            // var popIdContainer = document.getElementById("pop-id-container");
+            // var popupTitleText = document.getElementById("popup-title-text");
+            
+            // popIdContainer.style.display = "none";
+            // popupTitleText.textContent = "Add New Record";
+
+            // Check if both fields are filled
+            if (firstNameInput.value && lastNameInput.value) {
+
+                var isSuccess = await registerHuman(firstNameInput.value, lastNameInput.value);
+
+                // Call populateTable to refresh the table with the updated data
+                populateTable();
+                hidePopup();
+                // Clear input fields
+                firstNameInput.value = '';
+                lastNameInput.value = '';
+            } else {
+                alert("Please enter both first name and last name.");
+            }
+        }
+
+
+        async function updateRecord() {
+            // Ensure jsonData is initialized
+            if (!jsonData) {
+                jsonData = [];
+            }
 
             // Get values from input fields
             var popupIdLabel = document.getElementById("popup-id");
             var firstNameInput = document.getElementById("first-name");
             var lastNameInput = document.getElementById("last-name");
-            var popIdContainer = document.getElementById("pop-id-container");
-            var popupTitleText = document.getElementById("popup-title-text");
+            // var popIdContainer = document.getElementById("pop-id-container");
+            // var popupTitleText = document.getElementById("popup-title-text");
             
-            popIdContainer.style.display = "none";
-            popupTitleText.textContent = "Add New Record";
+            // popIdContainer.style.display = "none";
+            // popupTitleText.textContent = "Add New Record";
 
             // Check if both fields are filled
             if (firstNameInput.value && lastNameInput.value) {
-                // Generate a unique ID (assuming IDs are numbers)
-                var newId = jsonData.length > 0 ? jsonData[jsonData.length - 1].id + 1 : 1;
 
-                // Create a new record with input values
-                var newRecord = {
-                    id: newId,
-                    first_name: firstNameInput.value,
-                    last_name: lastNameInput.value
-                };
-
-                // Add the new record to jsonData
-                jsonData.push(newRecord);
+                var isSuccess = await updateHuman(popupIdLabel.textContent, firstNameInput.value, lastNameInput.value);
 
                 // Call populateTable to refresh the table with the updated data
                 populateTable();
-                toggleDisplayPopup();
+                hidePopup();
                 // Clear input fields
                 firstNameInput.value = '';
                 lastNameInput.value = '';
