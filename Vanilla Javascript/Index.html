@@ -79,6 +79,10 @@
         <button onclick="populateTable()" class="MuiButton-root MuiButton-contained">Show Record</button>
         <button onclick="showRegisterGUI()" class="MuiButton-root MuiButton-contained">Add New Record</button>
 
+        <br>
+        <label style="color: var(--primary-color);" id="count-label">Total Record Found:</label>
+
+
         <div class="overlay" id="overlay"></div>
         <div class="popup-container" id="popup">
             <div class="MuiPaper-root">
@@ -117,22 +121,31 @@
         async function populateTable() {
 
             var tableBody = document.getElementById("data-table-body");
+            var countLabel = document.getElementById("count-label");
+            
             tableBody.innerHTML = '';
 
             var listOfHumanData = await listOfHuman();
             
             jsonData = listOfHumanData.data;
+            countLabel.textContent = "Total Record Found:" + listOfHumanData.Total;
 
             for (var i = 0; i < jsonData.length; i++) {
                 var card = document.createElement("div");
                 card.className = "MuiPaper-root";
 
                 card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                    <div style="order:1; margin-right: 16px">
+                        <img src="userLogo.png" style="height: 100px; width: auto;" alt="User Profile">
+                    </div>
+                    <div style="order:2; margin-right: auto;">
                     <strong>ID:</strong> ${jsonData[i].id}<br>
                     <strong>First Name: </strong>${jsonData[i].first_name}<br>
                     <strong>Last Name: </strong>${jsonData[i].last_name}<br>
                     <button onclick="deleteRecord(${jsonData[i].id})" class="MuiButton-root MuiButton-contained">Delete</button>
                     <button onclick="showUpdateGUI(${jsonData[i].id})" id="button-update-${jsonData[i].id}" class="MuiButton-root MuiButton-contained">Click to Update</button>
+                    </div></div>
                 `;
 
                 tableBody.appendChild(card);
