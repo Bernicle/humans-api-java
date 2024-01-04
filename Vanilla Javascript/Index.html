@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Material-UI Table Population</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/material@5.0.5/dist/css/mui.min.css" integrity="sha512-R4zrnt+8Lo6DqSN51IuRE6bLGyGj5Rj9jrbyA8VEvZkA06jw+0RxXWTt+OGDEAPXe7zRQ1QLIosU0yL1gi4Ryg==" crossorigin="anonymous" /> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/material@5.0.5/dist/css/mui.min.css" integrity="sha512-R4zrnt+8Lo6DqSN51IuRE6bLGyGj5Rj9jrbyA8VEvZkA06jw+0RxXWTt+OGDEAPXe7zRQ1QLIosU0yL1gi4Ryg==" crossorigin="anonymous" />
     <style>
         :root {
             --primary-color: #2196F3;
@@ -74,9 +74,19 @@
 <body>
 
     <div style="padding: 16px;">
-        <h2 style="color: var(--primary-color);">Human Resources Management System</h2>
 
-        <button onclick="populateTable()" class="MuiButton-root MuiButton-contained">Show Record</button>
+        <div style="display: flex; justify-content: space-between;">
+            <div style="order:1; margin-right: 16px">
+                <img src="pragmanilaLogo.jpg" style="height: 100px; width: auto;" alt="User Profile">
+            </div>
+            <div style="order:2; margin-right: auto">
+                <h2 style="color: var(--primary-color);">Human Resources Management System</h2>
+                <h5 style="color: var(--tetradic-color-4);">11th floor Unit MN CyberOne Building, Eastwood Cyberpark Bagumbayan, Quezon City, Philippines 1110</h5>
+                <h5 style="color: var(--tetradic-color-4);">info@pragmanila.com</h5>
+            </div>
+        </div>
+        <br>
+        <button onclick="populateTable()" class="MuiButton-root MuiButton-contained">Search Record</button>
         <button onclick="showRegisterGUI()" class="MuiButton-root MuiButton-contained">Add New Record</button>
 
         <br>
@@ -110,7 +120,6 @@
         <div class="divider" style="border-top: 1px solid #ccc;margin: 10px 0;"></div>
 
         <div id="data-table-body" class="MuiTableBody-root">
-            <!-- Table content will be dynamically added here -->
         </div>
     </div>
 
@@ -214,8 +223,6 @@
 
             myDiv.style.display = "none";
             myPopup.style.display = "none";            
-            
-            // showRegisterGUI();
         }
 
         async function listOfHuman(id = null, first_name = null, last_name = null) {
@@ -395,25 +402,16 @@
                 jsonData = [];
             }
 
-            // Get values from input fields
-            // var popupIdLabel = document.getElementById("popup-id");
             var firstNameInput = document.getElementById("first-name");
             var lastNameInput = document.getElementById("last-name");
-            // var popIdContainer = document.getElementById("pop-id-container");
-            // var popupTitleText = document.getElementById("popup-title-text");
-            
-            // popIdContainer.style.display = "none";
-            // popupTitleText.textContent = "Add New Record";
 
-            // Check if both fields are filled
             if (firstNameInput.value && lastNameInput.value) {
 
                 var isSuccess = await registerHuman(firstNameInput.value, lastNameInput.value);
 
-                // Call populateTable to refresh the table with the updated data
                 populateTable();
                 hidePopup();
-                // Clear input fields
+
                 firstNameInput.value = '';
                 lastNameInput.value = '';
             } else {
@@ -428,17 +426,10 @@
                 jsonData = [];
             }
 
-            // Get values from input fields
             var popupIdLabel = document.getElementById("popup-id");
             var firstNameInput = document.getElementById("first-name");
             var lastNameInput = document.getElementById("last-name");
-            // var popIdContainer = document.getElementById("pop-id-container");
-            // var popupTitleText = document.getElementById("popup-title-text");
-            
-            // popIdContainer.style.display = "none";
-            // popupTitleText.textContent = "Add New Record";
 
-            // Check if both fields are filled
             if (firstNameInput.value && lastNameInput.value) {
 
                 var isSuccess = await updateHuman(popupIdLabel.textContent, firstNameInput.value, lastNameInput.value);
@@ -455,9 +446,9 @@
         }
     </script>
 
-    <!-- <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.development.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.development.js"></script> -->
-<!--     <script src="https://cdn.jsdelivr.net/npm/@mui/system@5.0.5/dist/index.esm.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mui/material@5.0.5/dist/index.esm.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mui/system@5.0.5/dist/index.esm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mui/material@5.0.5/dist/index.esm.min.js"></script>
 </body>
 </html>

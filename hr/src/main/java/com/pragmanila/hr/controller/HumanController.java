@@ -41,8 +41,9 @@ public class HumanController {
 			HumanResponseStructure data;
 			List<Human> listOfHuman = new ArrayList<Human>();
 			humanRepository.findAll().forEach(listOfHuman::add);
+			Human[] arrayOfHuman = listOfHuman.toArray(new Human[0])
+			data = new HumanResponseStructure(listOfHuman.toArray(new Human[0]), arrayOfHuman.length);
 
-			data = new HumanResponseStructure(listOfHuman.toArray(new Human[0]), listOfHuman.toArray(new Human[0]).length);
 			return new ResponseEntity<>(data, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,10 +81,8 @@ public class HumanController {
 
 		if (currentHuman != null) {
 			humanRepository.save(human);
-			// data.put("message", "Update Successful.");
 			return new ResponseEntity<>(new ResponseStructure("200", "Update Successful."), HttpStatus.OK);
 		} else {
-			// data.put("message", "Update Successful.");
 			return new ResponseEntity<>(new ResponseStructure("400", "No Record exist found."), HttpStatus.BAD_REQUEST);
 		}
 	}
